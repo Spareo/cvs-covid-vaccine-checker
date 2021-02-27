@@ -126,10 +126,10 @@ if __name__ == "__main__":
     is_first_run = True
 
     state = "Texas"
-    cities = ["PLANO", "RICHARDSON"]
+    cities = ["Plano", "Richardson"]
 
     logger = create_logger()
-    schedule.every(30).to(60).minutes.do(run)
+    schedule.every(15).minutes.do(run)
 
     while True:
         if is_first_run:
