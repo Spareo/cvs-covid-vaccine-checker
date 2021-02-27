@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 schedule = "*"
 python-dotenv = "*"
+click = "*"
 
 [dev-packages]
 

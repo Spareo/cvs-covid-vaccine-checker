@@ -24,8 +24,14 @@ Install the dependencies
 pipenv install
 ```
 
-## Run
+## Run Example
 ```
 pipenv shell
-python main.py
+python main.py --state Texas --city Plano --city Richardson --interval 15
+```
+
+## Help
+```
+pipenv shell
+python main.py --help
 ```

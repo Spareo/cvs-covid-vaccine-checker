@@ -1,4 +1,4 @@
-import urllib.request, json, logging, sys, os, requests, schedule, datetime, time
+import urllib.request, json, logging, sys, os, requests, schedule, datetime, time, click
 
 from datetime import datetime
 from dotenv import load_dotenv
@@ -88,22 +88,50 @@ def send_telegram(logger, message):
     logger.info(response.json())
 
 
-def run(cities, state, logger):
-    vaccine_statuses = None
+@click.command()
+@click.option('--state', help='The name of the state to check availability in', required=True)
+@click.option('--city', '-c', multiple=True, help='The name of the city to check availability for in your state', required=True)
+@click.option('--interval', type=int, help='The internval at which the availability status will be checked (minutes)', default=15)
+def run(state, city, interval):  
+    is_first_run = True
+    logger = create_logger()
+    cities = [c.upper() for c in city]
 
-    cities = [c.upper() for c in cities]
-    state_abbrev = get_state_abbreviation(state)
+    # Setup the scheduler
+    schedule.every(interval).minutes.do(one_run)
+
+    # Do first run without scheduler and run on schedule
+    while True:
+        if is_first_run:
+            one_run(state, cities, logger)
+            is_first_run = False
+        else:
+            next_run = schedule.next_run()
+            next_run_diff = next_run - datetime.now()
+            next_run_minutes = round(next_run_diff.total_seconds() / 60)
+            logger.info("Next run in {} minutes".format(next_run_minutes))
+
+            schedule.run_pending()
+
+            # Sleep until the next run + some extra time so when the loop 
+            time.sleep(next_run_minutes * 60 + 5)
+
+    
+
+def one_run(state, cities, logger):
+    vaccine_statuses = None
     cvs_url = get_covid_info_url_for_sate(state)
     logger.info(f"Retrieving CVS vaccine info from {cvs_url}")
+    state_abbrev = get_state_abbreviation(state)
 
-    with urllib.request.urlopen(cvs_url) as url:
-        data = json.loads(url.read().decode())
+    response = requests.get(cvs_url)
+    data = response.json()
 
-        if (data is None):
-            logger.error("Failed to retrieve state vaccine information, please make sure your state is available on the CVS vaccine website.")
-            sys.exit(1)
+    if (data is None):
+        logger.error("Failed to retrieve state vaccine information, please make sure your state is available on the CVS vaccine website.")
+        sys.exit(1)
 
-        vaccine_statuses = data['responsePayloadData']['data'][state_abbrev.upper()]
+    vaccine_statuses = data['responsePayloadData']['data'][state_abbrev.upper()]
 
     to_process = len(cities)
     for response_item in vaccine_statuses:
@@ -123,27 +151,4 @@ def run(cities, state, logger):
 
 if __name__ == "__main__":
     load_dotenv()
-    is_first_run = True
-
-    state = "Texas"
-    cities = ["Plano", "Richardson"]
-
-    logger = create_logger()
-    schedule.every(15).minutes.do(run)
-
-    while True:
-        if is_first_run:
-            run(cities, state, logger)
-            is_first_run = False
-        else:
-            next_run = schedule.next_run()
-            next_run_diff = next_run - datetime.now()
-            next_run_minutes = round(next_run_diff.total_seconds() / 60)
-            logger.info("Next run in {} minutes".format(next_run_minutes))
-
-            schedule.run_pending()
-
-            # Sleep until the next run + some extra time so when the loop 
-            time.sleep(next_run_minutes * 60 + 5)
-
-    
+    run()
