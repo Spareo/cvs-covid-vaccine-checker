@@ -30,6 +30,8 @@ pipenv shell
 python main.py --state Virginia --city Abingdon --city Dublin --interval 15
 ```
 
+**NOTE:** Your cities and state must come from the list of available cities and states found [here](https://www.cvs.com/immunizations/covid-19-vaccine)
+
 ## Help
 ```
 pipenv shell
