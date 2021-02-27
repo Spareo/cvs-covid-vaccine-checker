@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-schedule = "*"
 python-dotenv = "*"
 click = "*"
 

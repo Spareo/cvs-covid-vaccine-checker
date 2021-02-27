@@ -1,4 +1,4 @@
-import urllib.request, json, logging, sys, os, requests, schedule, datetime, time, click
+import logging, sys, os, requests, time, click
 
 from datetime import datetime
 from dotenv import load_dotenv
@@ -96,28 +96,16 @@ def send_telegram(logger, message):
 @click.option('--city', '-c', multiple=True, help='The name of the city to check availability for in your state', required=True)
 @click.option('--interval', type=int, help='The internval at which the availability status will be checked (minutes)', default=15)
 def run(state, city, interval):  
-    is_first_run = True
     logger = create_logger()
     cities = [c.upper() for c in city]
 
-    # Setup the scheduler
-    schedule.every(interval).minutes.do(one_run, state, city, logger)
-
-    # Do first run without scheduler and run on schedule
+    # Star cheecking
     while True:
-        if is_first_run:
-            one_run(state, cities, logger)
-            is_first_run = False
-        else:
-            next_run = schedule.next_run()
-            next_run_diff = next_run - datetime.now()
-            next_run_minutes = round(next_run_diff.total_seconds() / 60)
-            logger.info(f"Next run in {next_run_minutes} minutes")
+        one_run(state, cities, logger)
+        logger.info(f"Next run in {interval} minutes")
 
-            schedule.run_pending()
-
-            # Sleep until the next run + some extra time so when the loop 
-            time.sleep(next_run_minutes * 60 + 10)
+        # Sleep until the next run
+        time.sleep(interval * 60)
 
     
 
