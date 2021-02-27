@@ -34,6 +34,17 @@ python main.py --state Virginia --city Abingdon --city Dublin --interval 15
 
 ## Help
 ```
-pipenv shell
-python main.py --help
+Usage: main.py [OPTIONS]
+
+Options:
+  --state TEXT        The name of the state to check availability in
+                      [required]
+
+  -c, --city TEXT     The name of the city to check availability for in your
+                      state  [required]
+
+  --interval INTEGER  The internval at which the availability status will be
+                      checked (minutes)
+
+  --help              Show this message and exit.
 ```
