@@ -101,7 +101,7 @@ def run(state, city, interval):
     cities = [c.upper() for c in city]
 
     # Setup the scheduler
-    schedule.every(interval).minutes.do(one_run)
+    schedule.every(interval).minutes.do(one_run, state, city, logger)
 
     # Do first run without scheduler and run on schedule
     while True:
@@ -112,12 +112,12 @@ def run(state, city, interval):
             next_run = schedule.next_run()
             next_run_diff = next_run - datetime.now()
             next_run_minutes = round(next_run_diff.total_seconds() / 60)
-            logger.info("Next run in {} minutes".format(next_run_minutes))
+            logger.info(f"Next run in {next_run_minutes} minutes")
 
             schedule.run_pending()
 
             # Sleep until the next run + some extra time so when the loop 
-            time.sleep(next_run_minutes * 60 + 5)
+            time.sleep(next_run_minutes * 60 + 10)
 
     
 
