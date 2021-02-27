@@ -66,6 +66,7 @@ def get_state_abbreviation(long_name):
 
     return us_state_abbrev[long_name]
 
+
 def get_covid_info_url_for_sate(long_name):
     state_abbrev = get_state_abbreviation(long_name)
     return f"https://www.cvs.com/immunizations/covid-19-vaccine/immunizations/covid-19-vaccine.vaccine-status.{state_abbrev}.json?vaccineinfo"
@@ -108,7 +109,6 @@ def run(state, city, interval):
         time.sleep(interval * 60)
 
     
-
 def one_run(state, cities, logger):
     vaccine_statuses = None
     cvs_url = get_covid_info_url_for_sate(state)
