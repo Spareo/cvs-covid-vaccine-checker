@@ -27,7 +27,7 @@ pipenv install
 ## Run Example
 ```
 pipenv shell
-python main.py --state Texas --city Plano --city Richardson --interval 15
+python main.py --state Virginia --city Abingdon --city Dublin --interval 15
 ```
 
 ## Help
