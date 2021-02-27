@@ -83,9 +83,12 @@ def create_logger():
 
 
 def send_telegram(logger, message):
-    send_url = 'https://api.telegram.org/bot' + os.getenv("TELEGRAM_BOT_TOKEN") + '/sendMessage?chat_id=' + os.getenv("TELEGRAM_CHAT_ID") + '&parse_mode=Markdown&text=' + message
-    response = requests.get(send_url)
-    logger.info(response.json())
+    if 'TELEGRAM_BOT_TOKEN' in os.environ and 'TELEGRAM_CHAT_ID' in os.environ:
+        send_url = 'https://api.telegram.org/bot' + os.getenv("TELEGRAM_BOT_TOKEN") + '/sendMessage?chat_id=' + os.getenv("TELEGRAM_CHAT_ID") + '&parse_mode=Markdown&text=' + message
+        response = requests.get(send_url)
+        logger.info(response.json())
+    else:
+        pass
 
 
 @click.command()
